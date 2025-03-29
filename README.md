@@ -153,7 +153,7 @@ npm start
 
 ### [[教程](https://github.com/wes-lin/Cloud189Checkin/blob/main/doc/xuanwu)]
 ## 青龙面板
-### [[教程]([https://github.com/wes-lin/Cloud189Checkin/blob/main/doc/xuanwu](https://www.yuque.com/w992/it/cloud189checkin))]
+### [[教程](https://www.yuque.com/w992/it/cloud189checkin)]
 
 ## 其他环境集成
 
