@@ -4,7 +4,6 @@ const { CloudClient,FileTokenStore } = require("cloud189-sdk");
 const recording = require("log4js/lib/appenders/recording");
 const accounts = require("../accounts");
 const families = require("../families");
-const notify = require("./sendNotify");
 
 const {
   mask,
@@ -50,14 +49,12 @@ const doFamilyTask = async (cloudClient, logger) => {
       familyId = familyInfoResp[0].familyId;
     }
     logger.info(`执行家签ID:${familyId}`);
-    const tasks = Array.from({ length: execThreshold }, () =>
-      cloudClient.familyUserSign(familyId)
-    );
+    const tasks = [ cloudClient.familyUserSign(familyId) ]
     const result = (await Promise.allSettled(tasks)).filter(({ status, value })=> status ==='fulfilled' && !value.signStatus);
     return logger.info(
-      `家庭签到任务: 成功数 ${result.length} 获得 ${
-        result.map(({ value }) => value.bonusSpace)?.join(",") || "0"
-      }M 空间`
+      `家庭签到任务: 获得 ${
+         result.map(({ value }) => value.bonusSpace)?.join(",") || "0"
+       }M 空间`
     );
   }
 };
@@ -78,10 +75,24 @@ const run = async (userName, password, userSizeInfoMap, logger) => {
         userSizeInfo: beforeUserSizeInfo,
         logger,
       });
-      await Promise.all([
-        doUserTask(cloudClient, logger),
-        doFamilyTask(cloudClient, logger),
-      ]);
+      // await Promise.all([
+      //   doUserTask(cloudClient, logger),
+      //   doFamilyTask(cloudClient, logger),
+      // ]);
+      const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+      const tasks = [
+        () => doUserTask(cloudClient, logger),  // 包裹成函数
+        () => doFamilyTask(cloudClient, logger)
+      ];
+      
+      for (const task of tasks) {
+        const minDelay = 3000;   // 3 秒
+        const maxDelay = 30000; // 300 秒
+        const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
+        await delay(randomDelay); // 等待随机间隔
+        await task(); // 执行当前任务
+      }
+
     } catch (e) {
       if (e.response) {
         logger.log(`请求失败: ${e.response.statusCode}, ${e.response.body}`);
@@ -120,25 +131,32 @@ async function main() {
   for (const [userName, { cloudClient, userSizeInfo, logger } ] of userSizeInfoMap) {
     const afterUserSizeInfo = await cloudClient.getUserSizeInfo();
     logger.log(
-      `个人容量增加：${(
+      `个人容量：⬆️${(
         (afterUserSizeInfo.cloudCapacityInfo.totalSize -
           userSizeInfo.cloudCapacityInfo.totalSize) /
         1024 /
         1024
-      ).toFixed(2)}M\n家庭容量增加：${(
+      ).toFixed(2)}M/${(
+        afterUserSizeInfo.cloudCapacityInfo.totalSize /
+        1024 /
+        1024 /
+        1024
+      ).toFixed(2)}G`,
+      `家庭容量：⬆️${(
         (afterUserSizeInfo.familyCapacityInfo.totalSize -
           userSizeInfo.familyCapacityInfo.totalSize) /
         1024 /
         1024
-      ).toFixed(2)}M\n个人空间容量： ${(
-        afterUserSizeInfo.cloudCapacityInfo.totalSize /1024/1024/1024
-      ).toFixed(2)}G\n家庭空间容量： ${(
-        afterUserSizeInfo.familyCapacityInfo.totalSize /1024/1024/1024
+      ).toFixed(2)}M/${(
+        afterUserSizeInfo.familyCapacityInfo.totalSize /
+        1024 /
+        1024 /
+        1024
       ).toFixed(2)}G`
     );
   }
 }
-
+const notify = require("./sendNotify");
 
 (async () => {
   try {
