@@ -87,7 +87,7 @@ const run = async (userName, password, userSizeInfoMap, logger) => {
       
       for (const task of tasks) {
         const minDelay = 3000;   // 3 秒
-        const maxDelay = 30000; // 300 秒
+        const maxDelay = 30000; // 30 秒
         const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
         await delay(randomDelay); // 等待随机间隔
         await task(); // 执行当前任务
