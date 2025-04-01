@@ -142,7 +142,7 @@ async function main() {
         1024 /
         1024
       ).toFixed(2)}G`,
-      `家庭容量：⬆️${(
+      `\n家庭容量：⬆️${(
         (afterUserSizeInfo.familyCapacityInfo.totalSize -
           userSizeInfo.familyCapacityInfo.totalSize) /
         1024 /
