@@ -3,7 +3,7 @@ const got = require('got');
 const timeout = 15000;
 
 const push_config = {
-  HITOKOTO: false, // 启用一言（随机句子）
+  HITOKOTO: 'false', 
 
   BARK_PUSH: '', // bark IP 或设备码，例：https://api.day.app/DxHcxxxxxRxxxxxxcm/
   BARK_ARCHIVE: '', // bark 推送是否存档
@@ -86,7 +86,8 @@ const push_config = {
   SMTP_SERVICE: '', // 邮箱服务名称，比如 126、163、Gmail、QQ 等，支持列表 https://github.com/nodemailer/nodemailer/blob/master/lib/well-known/services.json
   SMTP_EMAIL: '', // SMTP 收发件邮箱，通知将会由自己发给自己
   SMTP_PASSWORD: '', // SMTP 登录密码，也可能为特殊口令，视具体邮件服务商说明而定
-  SMTP_NAME: '', // SMTP 收发件人姓名，可随意填写
+  SMTP_NAME: '', // SMTP 发件人姓名，可随意填写
+  TO_NAME: '',// SMTP 收件人姓名，可随意填写
 
   PUSHME_KEY: '', // 官方文档：https://push.i-i.me，PushMe 酱的 PUSHME_KEY
 
@@ -111,6 +112,13 @@ const push_config = {
   WXPUSHER_TOPIC_IDS: '', // wxpusher 的 主题ID，多个用英文分号;分隔 topic_ids 与 uids 至少配置一个才行
   WXPUSHER_UIDS: '', // wxpusher 的 用户ID，多个用英文分号;分隔 topic_ids 与 uids 至少配置一个才行
 };
+
+for (const key in push_config) {
+  const v = process.env[key];
+  if (v) {
+    push_config[key] = v;
+  }
+}
 
 const $ = {
   post: (params, callback) => {
@@ -986,7 +994,7 @@ function fsBotNotify(text, desp) {
 }
 
 async function smtpNotify(text, desp) {
-  const { SMTP_EMAIL, SMTP_PASSWORD, SMTP_SERVICE, SMTP_NAME } = push_config;
+  const { SMTP_EMAIL, SMTP_PASSWORD, SMTP_SERVICE, SMTP_NAME,TO_NAME } = push_config;
   if (![SMTP_EMAIL, SMTP_PASSWORD].every(Boolean) || !SMTP_SERVICE) {
     return;
   }
@@ -1001,10 +1009,12 @@ async function smtpNotify(text, desp) {
       },
     });
 
+    // const addr = SMTP_NAME ? `"${SMTP_NAME}" <${SMTP_EMAIL}>` : SMTP_EMAIL;
     const addr = SMTP_NAME ? `"${SMTP_NAME}" <${SMTP_EMAIL}>` : SMTP_EMAIL;
+    const toaddr = TO_NAME ? `"${TO_NAME}" <${TO_NAME}>` : TO_NAME;
     const info = await transporter.sendMail({
       from: addr,
-      to: addr,
+      to: toaddr,
       subject: text,
       html: `${desp.replace(/\n/g, '<br/>')}`,
     });
