@@ -26,38 +26,38 @@ const doUserTask = async (cloudClient, logger) => {
   );
 };
 
-// 家庭任务签到
-const doFamilyTask = async (cloudClient, logger) => {
-  const { familyInfoResp } = await cloudClient.getFamilyList();
-  if (familyInfoResp) {
-    let familyId = null;
-    //指定家庭签到
-    if (families.length > 0) {
-      const tagetFamily = familyInfoResp.find((familyInfo) =>
-        families.includes(familyInfo.remarkName)
-      );
-      if (tagetFamily) {
-        familyId = tagetFamily.familyId;
-      } else {
-        logger.error(
-          `没有加入到指定家庭分组${families
-            .map((family) => mask(family, 3, 7))
-            .toString()}`
-        );
-      }
-    } else {
-      familyId = familyInfoResp[0].familyId;
-    }
-    logger.info(`执行家签ID:${familyId}`);
-    const tasks = [ cloudClient.familyUserSign(familyId) ]
-    const result = (await Promise.allSettled(tasks)).filter(({ status, value })=> status ==='fulfilled' && !value.signStatus);
-    return logger.info(
-      `家庭签到任务: 获得 ${
-         result.map(({ value }) => value.bonusSpace)?.join(",") || "0"
-       }M 空间`
-    );
-  }
-};
+// // 家庭任务签到
+// const doFamilyTask = async (cloudClient, logger) => {
+//   const { familyInfoResp } = await cloudClient.getFamilyList();
+//   if (familyInfoResp) {
+//     let familyId = null;
+//     //指定家庭签到
+//     if (families.length > 0) {
+//       const tagetFamily = familyInfoResp.find((familyInfo) =>
+//         families.includes(familyInfo.remarkName)
+//       );
+//       if (tagetFamily) {
+//         familyId = tagetFamily.familyId;
+//       } else {
+//         logger.error(
+//           `没有加入到指定家庭分组${families
+//             .map((family) => mask(family, 3, 7))
+//             .toString()}`
+//         );
+//       }
+//     } else {
+//       familyId = familyInfoResp[0].familyId;
+//     }
+//     logger.info(`执行家签ID:${familyId}`);
+//     const tasks = [ cloudClient.familyUserSign(familyId) ]
+//     const result = (await Promise.allSettled(tasks)).filter(({ status, value })=> status ==='fulfilled' && !value.signStatus);
+//     return logger.info(
+//       `家庭签到任务: 获得 ${
+//          result.map(({ value }) => value.bonusSpace)?.join(",") || "0"
+//        }M 空间`
+//     );
+//   }
+// };
 
 const run = async (userName, password, userSizeInfoMap, logger) => {
   if (userName && password) {
@@ -82,7 +82,7 @@ const run = async (userName, password, userSizeInfoMap, logger) => {
       const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
       const tasks = [
         () => doUserTask(cloudClient, logger),  // 包裹成函数
-        () => doFamilyTask(cloudClient, logger)
+        // () => doFamilyTask(cloudClient, logger)
       ];
       
       for (const task of tasks) {
