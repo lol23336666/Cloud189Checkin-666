@@ -141,18 +141,18 @@ async function main() {
         1024 /
         1024 /
         1024
-      ).toFixed(2)}G`,
-      `\n家庭容量：⬆️${(
-        (afterUserSizeInfo.familyCapacityInfo.totalSize -
-          userSizeInfo.familyCapacityInfo.totalSize) /
-        1024 /
-        1024
-      ).toFixed(2)}M/${(
-        afterUserSizeInfo.familyCapacityInfo.totalSize /
-        1024 /
-        1024 /
-        1024
       ).toFixed(2)}G`
+      // `\n家庭容量：⬆️${(
+      //   (afterUserSizeInfo.familyCapacityInfo.totalSize -
+      //     userSizeInfo.familyCapacityInfo.totalSize) /
+      //   1024 /
+      //   1024
+      // ).toFixed(2)}M/${(
+      //   afterUserSizeInfo.familyCapacityInfo.totalSize /
+      //   1024 /
+      //   1024 /
+      //   1024
+      // ).toFixed(2)}G`
     );
   }
 }
