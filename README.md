@@ -1,7 +1,7 @@
 # Cloud189Checkin
 
 
-基于[wes-lin/Cloud189Checkin](https://github.com/wes-lin/Cloud189Checkin)修改，增加推送方式
+基于[wes-lin/Cloud189Checkin](https://github.com/wes-lin/Cloud189Checkin)修改，增加推送方式，增加多账号任务随机间隙签到，不扎堆签到，
 天翼网盘自动签到（随机容量），~~家庭空间签到（随机容量）~~（家庭签到已挂）。
 
 # 重要说明！！！
